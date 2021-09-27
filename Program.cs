@@ -6,8 +6,13 @@ namespace Лабиринт_Двоичное_дерево
     {
         static void Main(string[] args)
         {
-            Map map = new Map(10, 10);
-            map.Show();
+            bool key = false, door = false;
+            Map map = new Map(10, 10, key, door);
+            Character ch = new Character(map, 1, 1);
+            while(!ch.win)
+            {
+                ch.Moove(Console.ReadLine());
+            }
         }
     }
     class Tile
@@ -28,10 +33,14 @@ namespace Лабиринт_Двоичное_дерево
     class Map
     {
         Tile[,] map;
-        public Map(int x, int y)
+        bool key;
+        bool door;
+        public Map(int x, int y, bool key, bool door)
         {
             x *= 3;
             y *= 3;
+            this.key = key;
+            this.door = door;
             map = new Tile[x, y];
             int[,] bones = Map_bones(x, y);
             bones = Labirynth_builder(bones);
@@ -69,8 +78,9 @@ namespace Лабиринт_Двоичное_дерево
             }
             return ret;
         }
-        public void Show()
+        public int Show()
         {
+            Console.Clear();
             for (int i = 0; i < map.GetLength(0); i++)
             {
                 for (int j = 0; j < map.GetLength(1); j++)
@@ -79,7 +89,12 @@ namespace Лабиринт_Двоичное_дерево
                 }
                 Console.WriteLine();
             }
-            Console.WriteLine(map.GetLength(0) + " " + map.GetLength(1));
+            if (door == true)
+            {
+                Console.WriteLine("Лабиринт пройден\n");
+                return 1;
+            }
+            else return 0;
         }
         int[,] Key_place(int[,] bones)
         {
@@ -218,6 +233,98 @@ namespace Лабиринт_Двоичное_дерево
             }
             bones = Path_builder(bones);
             return bones;
+        }
+        public void Step_into(int x, int y, int character, int prev_x, int prev_y)
+        {
+            if (map[x, y].Select_type != 1)
+            {
+                if(map[x, y].Select_type == 2)
+                {
+                    key = true;
+                }
+                if(map[x, y].Select_type == 3 && key == true)
+                {
+                    door = true;
+                }
+                map[x, y] = new Tile(character);
+                map[prev_x, prev_y] = new Tile(0);
+            }
+            else
+            {
+                Console.WriteLine("Сюда нельзя\n");
+            }
+        }
+    }
+    class Character
+    {
+        public bool win = false;
+        int cur_x, prew_x;
+        int cur_y, prew_y;
+        int character = 5;
+        public int Char_type { get
+            {
+                return character;
+            } }
+        Map map;
+        public Character(Map map, int x, int y)
+        {
+            this.map = map;
+            this.prew_x = x;
+            this.prew_y = y;
+            cur_x = 1;
+            cur_y = 1;
+            Draw_char();
+        }
+        public void Moove(string command)
+        {
+            string[] s = command.Split('_');
+            int n = Convert.ToInt32(s[1]);
+            switch (s[0])
+            {
+                case "верх":
+                    while (n > 0)
+                    {
+                        cur_x++;
+                        Draw_char();
+                        n--;
+                    }
+                    break;
+                case "вниз":
+                    while (n > 0)
+                    {
+                        cur_x++;
+                        Draw_char();
+                        n--;
+                    }
+                    break;
+                case "влево":
+                    while (n > 0)
+                    {
+                        cur_y--;
+                        Draw_char();
+                        n--;
+                    }
+                    break;
+                case "вправо":
+                    while (n > 0)
+                    {
+                        cur_y++;
+                        Draw_char();
+                        n--;
+                    }
+                    break;
+                default:
+                    Console.WriteLine("Такой команды не предусмотрено\n");
+                    break;
+            }
+        }
+        void Draw_char()
+        {
+            map.Step_into(cur_x, cur_y, Char_type, prew_x, prew_y);
+            if (map.Show() == 1)
+            {
+                win = true;
+            }
         }
     }
 }
