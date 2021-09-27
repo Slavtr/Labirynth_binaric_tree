@@ -84,7 +84,7 @@ namespace Лабиринт_Двоичное_дерево
         int[,] Key_place(int[,] bones)
         {
             Random r = new Random();
-            int x = r.Next(2, bones.GetLength(0)), y = r.Next(2, bones.GetLength(1));
+            int x = r.Next(2, bones.GetLength(0) - 1), y = r.Next(2, bones.GetLength(1) - 1);
             bones[x, y] = 2;
             while (true)
             {
@@ -130,8 +130,8 @@ namespace Лабиринт_Двоичное_дерево
             int x, y;
             while (true)
             {
-                x = r.Next(2, bones.GetLength(0));
-                y = r.Next(2, bones.GetLength(1));
+                x = r.Next(2, bones.GetLength(0) - 1);
+                y = r.Next(2, bones.GetLength(1) - 1);
                 if (bones[x, y] != 2)
                 {
                     bones[x, y] = 3;
@@ -206,12 +206,18 @@ namespace Лабиринт_Двоичное_дерево
                     }
                 }
             }
+            int n = bones.GetLength(0);
+            int m = bones.GetLength(1);
+            for (int a = 0; a < m; a++)
+            {
+                bones[n - 1, a] = 1;
+            }
+            for (int b = 0; b < n; b++)
+            {
+                bones[b, m - 1] = 1;
+            }
             bones = Path_builder(bones);
             return bones;
-        }
-        int[,] Path_finder(int[,] bones)
-        {
-
         }
     }
 }
