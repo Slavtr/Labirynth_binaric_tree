@@ -234,7 +234,7 @@ namespace Лабиринт_Двоичное_дерево
             bones = Path_builder(bones);
             return bones;
         }
-        public void Step_into(int x, int y, int character, int prev_x, int prev_y)
+        public void Step_into(ref int x, ref int y, int character, int prev_x, int prev_y)
         {
             if (map[x, y].Select_type != 1)
             {
@@ -251,7 +251,8 @@ namespace Лабиринт_Двоичное_дерево
             }
             else
             {
-                Console.WriteLine("Сюда нельзя\n");
+                x = prev_x;
+                y = prev_y;
             }
         }
     }
@@ -284,7 +285,8 @@ namespace Лабиринт_Двоичное_дерево
                 case "верх":
                     while (n > 0)
                     {
-                        cur_x++;
+                        prew_x = cur_x;
+                        cur_x--;
                         Draw_char();
                         n--;
                     }
@@ -292,6 +294,7 @@ namespace Лабиринт_Двоичное_дерево
                 case "вниз":
                     while (n > 0)
                     {
+                        prew_x = cur_x;
                         cur_x++;
                         Draw_char();
                         n--;
@@ -300,6 +303,7 @@ namespace Лабиринт_Двоичное_дерево
                 case "влево":
                     while (n > 0)
                     {
+                        prew_y = cur_y;
                         cur_y--;
                         Draw_char();
                         n--;
@@ -308,6 +312,7 @@ namespace Лабиринт_Двоичное_дерево
                 case "вправо":
                     while (n > 0)
                     {
+                        prew_y = cur_y;
                         cur_y++;
                         Draw_char();
                         n--;
@@ -320,7 +325,7 @@ namespace Лабиринт_Двоичное_дерево
         }
         void Draw_char()
         {
-            map.Step_into(cur_x, cur_y, Char_type, prew_x, prew_y);
+            map.Step_into(ref cur_x, ref cur_y, Char_type, prew_x, prew_y);
             if (map.Show() == 1)
             {
                 win = true;
