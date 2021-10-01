@@ -8,7 +8,7 @@ namespace Лабиринт_Двоичное_дерево
         {
             bool key = false, door = false;
             Map map = new Map(10, 10, key, door);
-            Character ch = new Character(map, 1, 1);
+            Character ch = new Character(map, 0, 0);
             while(!ch.win)
             {
                 ch.Moove(Console.ReadLine());
