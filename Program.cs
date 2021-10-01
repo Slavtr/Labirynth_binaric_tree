@@ -246,8 +246,19 @@ namespace Лабиринт_Двоичное_дерево
                 {
                     door = true;
                 }
+                else if(map[x, y].Select_type == 3 && key == false)
+                {
+                    map[x, y] = new Tile(3);
+                    x = prev_x;
+                    y = prev_y;
+                }
                 map[x, y] = new Tile(character);
-                map[prev_x, prev_y] = new Tile(0);
+                if (prev_x == 0 && prev_y == 0)
+                {
+                    map[prev_x, prev_y] = new Tile(1);
+                }
+                else
+                    map[prev_x, prev_y] = new Tile(0);
             }
             else
             {
@@ -282,9 +293,10 @@ namespace Лабиринт_Двоичное_дерево
             int n = Convert.ToInt32(s[1]);
             switch (s[0])
             {
-                case "верх":
+                case "вверх":
                     while (n > 0)
                     {
+                        prew_y = cur_y;
                         prew_x = cur_x;
                         cur_x--;
                         Draw_char();
@@ -294,6 +306,7 @@ namespace Лабиринт_Двоичное_дерево
                 case "вниз":
                     while (n > 0)
                     {
+                        prew_y = cur_y;
                         prew_x = cur_x;
                         cur_x++;
                         Draw_char();
@@ -304,6 +317,7 @@ namespace Лабиринт_Двоичное_дерево
                     while (n > 0)
                     {
                         prew_y = cur_y;
+                        prew_x = cur_x;
                         cur_y--;
                         Draw_char();
                         n--;
@@ -313,6 +327,7 @@ namespace Лабиринт_Двоичное_дерево
                     while (n > 0)
                     {
                         prew_y = cur_y;
+                        prew_x = cur_x;
                         cur_y++;
                         Draw_char();
                         n--;
