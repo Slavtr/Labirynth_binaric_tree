@@ -33,8 +33,8 @@ namespace Лабиринт_Двоичное_дерево
     class Map
     {
         Tile[,] map;
-        bool key;
-        bool door;
+        public bool key;
+        public bool door;
         public Map(int x, int y, bool key, bool door)
         {
             x *= 3;
@@ -234,31 +234,34 @@ namespace Лабиринт_Двоичное_дерево
             bones = Path_builder(bones);
             return bones;
         }
-        public void Step_into(ref int x, ref int y, int character, int prev_x, int prev_y)
+        public void Step_into(ref int x, ref int y, int character, int prev_x, int prev_y, ref Tile nxTile, ref Tile curTile, bool interact)
         {
             if (map[x, y].Select_type != 1)
             {
-                if(map[x, y].Select_type == 2)
+                if (nxTile.Select_type == 2 && interact)
                 {
                     key = true;
+                    curTile = new Tile(0);
+                    map[x, y] = new Tile(0);
                 }
-                if(map[x, y].Select_type == 3 && key == true)
+                else if (nxTile.Select_type == 3 && key && interact)
                 {
                     door = true;
                 }
-                else if(map[x, y].Select_type == 3 && key == false)
-                {
-                    map[x, y] = new Tile(3);
-                    x = prev_x;
-                    y = prev_y;
-                }
-                map[x, y] = new Tile(character);
-                if (prev_x == 0 && prev_y == 0)
-                {
-                    map[prev_x, prev_y] = new Tile(1);
-                }
                 else
-                    map[prev_x, prev_y] = new Tile(0);
+                {
+                    nxTile = new Tile(map[x, y].Select_type);
+                    map[x, y] = new Tile(character);
+                    if (prev_x == 0 && prev_y == 0)
+                    {
+                        map[prev_x, prev_y] = new Tile(1);
+                    }
+                    else if (curTile.Select_type == 2)
+                    {
+                        map[prev_x, prev_y] = new Tile(0);
+                    }
+                    else map[prev_x, prev_y] = curTile;
+                }
             }
             else
             {
@@ -273,6 +276,7 @@ namespace Лабиринт_Двоичное_дерево
         int cur_x, prew_x;
         int cur_y, prew_y;
         int character = 5;
+        Tile curTile, nxTile;
         public int Char_type { get
             {
                 return character;
@@ -285,62 +289,72 @@ namespace Лабиринт_Двоичное_дерево
             this.prew_y = y;
             cur_x = 1;
             cur_y = 1;
-            Draw_char();
+            curTile = new Tile(0);
+            nxTile = new Tile(0);
+            Draw_char(false);
         }
         public void Moove(string command)
         {
             string[] s = command.Split('_');
-            int n = Convert.ToInt32(s[1]);
+            int n;
             switch (s[0])
             {
                 case "вверх":
+                    n = Convert.ToInt32(s[1]);
                     while (n > 0)
                     {
                         prew_y = cur_y;
                         prew_x = cur_x;
                         cur_x--;
-                        Draw_char();
+                        Draw_char(false);
                         n--;
                     }
                     break;
                 case "вниз":
+                    n = Convert.ToInt32(s[1]);
                     while (n > 0)
                     {
                         prew_y = cur_y;
                         prew_x = cur_x;
                         cur_x++;
-                        Draw_char();
+                        Draw_char(false);
                         n--;
                     }
                     break;
                 case "влево":
+                    n = Convert.ToInt32(s[1]);
                     while (n > 0)
                     {
                         prew_y = cur_y;
                         prew_x = cur_x;
                         cur_y--;
-                        Draw_char();
+                        Draw_char(false);
                         n--;
                     }
                     break;
                 case "вправо":
+                    n = Convert.ToInt32(s[1]);
                     while (n > 0)
                     {
                         prew_y = cur_y;
                         prew_x = cur_x;
                         cur_y++;
-                        Draw_char();
+                        Draw_char(false);
                         n--;
                     }
+                    break;
+                case "использовать":
+                    Draw_char(true);
                     break;
                 default:
                     Console.WriteLine("Такой команды не предусмотрено\n");
                     break;
             }
         }
-        void Draw_char()
+        void Draw_char(bool interact)
         {
-            map.Step_into(ref cur_x, ref cur_y, Char_type, prew_x, prew_y);
+            curTile = nxTile;
+            map.Step_into(ref cur_x, ref cur_y, Char_type, prew_x, prew_y, ref nxTile, ref curTile, interact);
             if (map.Show() == 1)
             {
                 win = true;
