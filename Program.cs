@@ -8,6 +8,7 @@ namespace Лабиринт_Двоичное_дерево
         static void Main(string[] args)
         {
             bool key = false, door = false;
+            Map
             Map map = new Map(10, 10, key, door, 2);
             Character ch = new Character(map, 0, 0);
             while (!ch.win)
@@ -55,6 +56,10 @@ namespace Лабиринт_Двоичное_дерево
             return "(" + x + ";" + y + ")";
         }
     }
+    /// <summary>
+    /// Класс, создающий и пестующий карту. 
+    /// Чтобы создать карту для задания 1 - QNum должен быть равен 1. Чтобы создать карту задания 2 - QNum должен быть равен 2.
+    /// </summary>
     class Map
     {
         Tile[,] map;
