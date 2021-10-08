@@ -241,27 +241,80 @@ namespace Лабиринт_Двоичное_дерево
         {
             path = new List<Coords_path>();
             Random r = new Random();
-            for (int i = 1; i < map.GetLength(0); i++)
+            int xlast = 0, ylast = 0, xstart = 1, ystart = 1, d = -1;
+            int[,] temp = new int[bones.GetLength(0), bones.GetLength(1)];
+            for(int i = 0; i<bones.GetLength(0); i++)
             {
-                for (int j = 1; j < map.GetLength(1) - 2; j++)
+                for(int j = 0; j<bones.GetLength(1); j++)
                 {
-                    if (r.Next() % 100 != 0)
+                    temp[i, j] = bones[i, j];
+                }
+            }
+            do
+            {
+                xlast = r.Next(1, bones.GetLength(0) - 1);
+                ylast = r.Next(1, bones.GetLength(1) - 1);
+            } while (bones[xlast, ylast] == 1);
+            temp[xstart, ystart] = d;
+            while(temp[xlast, ylast] == 0)
+            {
+                for(int i = 1; i < temp.GetLength(0); i++)
+                {
+                    for(int j = 1; j<temp.GetLength(1); j++)
                     {
-                        if (bones[i + 1, j] == 0)
+                        if (temp[i, j] == d)
                         {
-                            path.Add(new Coords_path(i + 1, j));
-                        }
-                        else
-                        {
-                            if (bones[i, j + 1] == 0)
+                            if (temp[i + 1, j] == 0)
                             {
-                                path.Add(new Coords_path(i, j + 1));
+                                temp[i + 1, j] = d - 1;
                             }
-                            else return bones;
+                            if (temp[i, j + 1] == 0)
+                            {
+                                temp[i, j + 1] = d - 1;
+                            }
+                            if (temp[i - 1, j] == 0)
+                            {
+                                temp[i - 1, j] = d - 1;
+                            }
+                            if (temp[i, j - 1] == 0)
+                            {
+                                temp[i, j - 1] = d - 1;
+                            }
                         }
                     }
                 }
+                d--;
             }
+            Coords_path n = new Coords_path(xlast, ylast);
+            path.Add(n);
+            Coords_path usl = new Coords_path(xstart, ystart);
+            while (d != -1)   
+            {
+                if (temp[xlast - 1, ylast] == d + 1)
+                {
+                    xlast--;
+                    temp[xlast + 1, ylast] = 0;
+                }
+                else if (temp[xlast, ylast - 1] == d + 1)
+                {
+                    ylast--;
+                    temp[xlast, ylast + 1] = 0;
+                }
+                else if (temp[xlast + 1, ylast] == d + 1)
+                {
+                    xlast++;
+                    temp[xlast + 1, ylast] = 0;
+                }
+                else if (temp[xlast, ylast + 1] == d + 1)
+                {
+                    ylast++;
+                    temp[xlast, ylast + 1] = 0;
+                }
+                n = new Coords_path(xlast, ylast);
+                path.Add(n);
+                d++;
+            }
+            path.Reverse();
             return bones;
         }
         int[,] Labirynth_builder(int[,] bones)
