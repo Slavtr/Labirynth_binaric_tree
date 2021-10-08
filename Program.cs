@@ -294,25 +294,34 @@ namespace Лабиринт_Двоичное_дерево
                 {
                     xlast--;
                     temp[xlast + 1, ylast] = 0;
+                    n = new Coords_path(xlast, ylast);
+                    path.Add(n);
+                    d++;
                 }
                 else if (temp[xlast, ylast - 1] == d + 1)
                 {
                     ylast--;
                     temp[xlast, ylast + 1] = 0;
+                    n = new Coords_path(xlast, ylast);
+                    path.Add(n);
+                    d++;
                 }
                 else if (temp[xlast + 1, ylast] == d + 1)
                 {
                     xlast++;
                     temp[xlast + 1, ylast] = 0;
+                    n = new Coords_path(xlast, ylast);
+                    path.Add(n);
+                    d++;
                 }
                 else if (temp[xlast, ylast + 1] == d + 1)
                 {
                     ylast++;
                     temp[xlast, ylast + 1] = 0;
+                    n = new Coords_path(xlast, ylast);
+                    path.Add(n);
+                    d++;
                 }
-                n = new Coords_path(xlast, ylast);
-                path.Add(n);
-                d++;
             }
             path.Reverse();
             return bones;
