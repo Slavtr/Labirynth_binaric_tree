@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Лабиринт_Двоичное_дерево
 {
@@ -7,9 +8,9 @@ namespace Лабиринт_Двоичное_дерево
         static void Main(string[] args)
         {
             bool key = false, door = false;
-            Map map = new Map(10, 10, key, door);
+            Map map = new Map(10, 10, key, door, 2);
             Character ch = new Character(map, 0, 0);
-            while(!ch.win)
+            while (!ch.win)
             {
                 ch.Moove(Console.ReadLine());
             }
@@ -30,13 +31,40 @@ namespace Лабиринт_Двоичное_дерево
             this.type = type;
         }
     }
+    struct Coords_path
+    {
+        int x;
+        int y;
+        public Coords_path(int x, int y)
+        {
+            this.x = x;
+            this.y = y;
+        }
+        public static bool operator == (Coords_path a, Coords_path b)
+        {
+            if (a.x == b.x && a.y == b.y) return true;
+            else return false;
+        }
+        public static bool operator != (Coords_path a, Coords_path b)
+        {
+            if (a.x != b.x && a.y != b.y) return true;
+            else return false;
+        }
+        public override string ToString()
+        {
+            return "(" + x + ";" + y + ")";
+        }
+    }
     class Map
     {
         Tile[,] map;
         public bool key;
         public bool door;
-        public Map(int x, int y, bool key, bool door)
+        int Quest_number;
+        public List<Coords_path> path = null;
+        public Map(int x, int y, bool key, bool door, int QNum)
         {
+            Quest_number = QNum;
             x *= 3;
             y *= 3;
             this.key = key;
@@ -88,6 +116,14 @@ namespace Лабиринт_Двоичное_дерево
                     Console.Write(map[i, j].Select_type.ToString());
                 }
                 Console.WriteLine();
+            }
+            if (path != null)
+            {
+                Console.WriteLine("Где окажется персонаж, пройдя по пути: ");
+                foreach(Coords_path c in path)
+                {
+                    Console.WriteLine(c.ToString());
+                }
             }
             if (door == true)
             {
@@ -197,6 +233,33 @@ namespace Лабиринт_Двоичное_дерево
             bones = Door_place(bones);
             return bones;
         }
+        int[,] Goal_builder(int[,] bones)
+        {
+            path = new List<Coords_path>();
+            Random r = new Random();
+            for (int i = 1; i < map.GetLength(0); i++)
+            {
+                for (int j = 1; j < map.GetLength(1) - 2; j++)
+                {
+                    if (r.Next() % 100 != 0)
+                    {
+                        if (bones[i + 1, j] == 0)
+                        {
+                            path.Add(new Coords_path(i + 1, j));
+                        }
+                        else
+                        {
+                            if (bones[i, j + 1] == 0)
+                            {
+                                path.Add(new Coords_path(i, j + 1));
+                            }
+                            else return bones;
+                        }
+                    }
+                }
+            }
+            return bones;
+        }
         int[,] Labirynth_builder(int[,] bones)
         {
             Random r = new Random();
@@ -231,7 +294,15 @@ namespace Лабиринт_Двоичное_дерево
             {
                 bones[b, m - 1] = 1;
             }
-            bones = Path_builder(bones);
+            switch (Quest_number)
+            {
+                case 1:
+                    bones = Path_builder(bones);
+                    break;
+                case 2:
+                    bones = Goal_builder(bones);
+                    break;
+            }
             return bones;
         }
         public void Step_into(ref int x, ref int y, int character, int prev_x, int prev_y, ref Tile nxTile, ref Tile curTile, bool interact)
@@ -269,6 +340,17 @@ namespace Лабиринт_Двоичное_дерево
                 y = prev_y;
             }
         }
+        public int Check_path(int x, int y)
+        {
+            Coords_path cp = new Coords_path(x, y);
+            if (path[path.Count - 1] == cp)
+            {
+                Console.WriteLine("Правильно!");
+                return 1;
+            }
+            else Console.WriteLine("Не правильно!");
+            return 0;
+        }
     }
     class Character
     {
@@ -277,10 +359,13 @@ namespace Лабиринт_Двоичное_дерево
         int cur_y, prew_y;
         int character = 5;
         Tile curTile, nxTile;
-        public int Char_type { get
+        public int Char_type
+        {
+            get
             {
                 return character;
-            } }
+            }
+        }
         Map map;
         public Character(Map map, int x, int y)
         {
@@ -345,6 +430,14 @@ namespace Лабиринт_Двоичное_дерево
                     break;
                 case "использовать":
                     Draw_char(true);
+                    break;
+                case "проверить":
+                    int a = Convert.ToInt32(Console.ReadLine());
+                    int b = Convert.ToInt32(Console.ReadLine());
+                    if(map.Check_path(a,b) == 1)
+                    {
+                        win = true;
+                    }
                     break;
                 default:
                     Console.WriteLine("Такой команды не предусмотрено\n");
