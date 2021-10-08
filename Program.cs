@@ -8,7 +8,6 @@ namespace Лабиринт_Двоичное_дерево
         static void Main(string[] args)
         {
             bool key = false, door = false;
-            Map
             Map map = new Map(10, 10, key, door, 2);
             Character ch = new Character(map, 0, 0);
             while (!ch.win)
