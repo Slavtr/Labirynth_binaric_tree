@@ -33,8 +33,8 @@ namespace Лабиринт_Двоичное_дерево
     }
     struct Coords_path
     {
-        int x;
-        int y;
+        public int x;
+        public int y;
         public Coords_path(int x, int y)
         {
             this.x = x;
@@ -66,6 +66,7 @@ namespace Лабиринт_Двоичное_дерево
         public bool door;
         int Quest_number;
         public List<Coords_path> path = null;
+        string pathstr = "";
         public Map(int x, int y, bool key, bool door, int QNum)
         {
             Quest_number = QNum;
@@ -123,11 +124,7 @@ namespace Лабиринт_Двоичное_дерево
             }
             if (path != null)
             {
-                Console.WriteLine("Где окажется персонаж, пройдя по пути: ");
-                foreach(Coords_path c in path)
-                {
-                    Console.WriteLine(c.ToString());
-                }
+                Console.WriteLine("Где окажется персонаж, пройдя по пути: \n" + pathstr);
             }
             if (door == true)
             {
@@ -322,9 +319,62 @@ namespace Лабиринт_Двоичное_дерево
                     path.Add(n);
                     d++;
                 }
+                bones[xlast, ylast] = 9;
             }
             path.Reverse();
             return bones;
+        }
+        string Path_to_string()
+        {
+            string retstr = "";
+            for(int i = 1; i<path.Count; i++)
+            {
+                if (path[i - 1].x < path[i].x)
+                {
+                    retstr += "вниз";
+                    int count = 1;
+                    while (path[i - 1].x < path[i].x && i < path.Count - 1) 
+                    {
+                        count++;
+                        i++;
+                    }
+                    retstr += "_" + count.ToString() + ";\n";
+                }
+                if(path[i - 1].x > path[i].x)
+                {
+                    retstr += "вверх";
+                    int count = 1;
+                    while (path[i - 1].x > path[i].x && i < path.Count - 1)
+                    {
+                        count++;
+                        i++;
+                    }
+                    retstr += "_" + count.ToString() + ";\n";
+                }
+                if (path[i - 1].y < path[i].y)
+                {
+                    retstr += "вправо";
+                    int count = 0;
+                    while (path[i - 1].y < path[i].y && i < path.Count - 1)
+                    {
+                        count++;
+                        i++;
+                    }
+                    retstr += "_" + count.ToString() + ";\n";
+                }
+                if (path[i - 1].y > path[i].y)
+                {
+                    retstr += "влево";
+                    int count = 0;
+                    while (path[i - 1].y > path[i].y && i < path.Count - 1)
+                    {
+                        count++;
+                        i++;
+                    }
+                    retstr += "_" + count.ToString() + ";\n";
+                }
+            }
+            return retstr;
         }
         int[,] Labirynth_builder(int[,] bones)
         {
@@ -367,6 +417,7 @@ namespace Лабиринт_Двоичное_дерево
                     break;
                 case 2:
                     bones = Goal_builder(bones);
+                    pathstr = Path_to_string();
                     break;
             }
             return bones;
