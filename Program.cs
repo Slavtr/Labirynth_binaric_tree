@@ -319,7 +319,6 @@ namespace Лабиринт_Двоичное_дерево
                     path.Add(n);
                     d++;
                 }
-                bones[xlast, ylast] = 9;
             }
             path.Reverse();
             return bones;
@@ -327,16 +326,21 @@ namespace Лабиринт_Двоичное_дерево
         string Path_to_string()
         {
             string retstr = "";
-            for(int i = 1; i<path.Count; i++)
+            int i = 1;
+            while (i < path.Count) 
             {
                 if (path[i - 1].x < path[i].x)
                 {
                     retstr += "вниз";
                     int count = 1;
-                    while (path[i - 1].x < path[i].x && i < path.Count - 1) 
+                    while (i < path.Count - 1 && path[i - 1].x < path[i].x) 
                     {
                         count++;
                         i++;
+                    }
+                    if (i == path.Count - 1)
+                    {
+                        count++;
                     }
                     retstr += "_" + count.ToString() + ";\n";
                 }
@@ -344,10 +348,14 @@ namespace Лабиринт_Двоичное_дерево
                 {
                     retstr += "вверх";
                     int count = 1;
-                    while (path[i - 1].x > path[i].x && i < path.Count - 1)
+                    while (i < path.Count - 1 && path[i - 1].x > path[i].x) 
                     {
                         count++;
                         i++;
+                    }
+                    if (i == path.Count - 1)
+                    {
+                        count++;
                     }
                     retstr += "_" + count.ToString() + ";\n";
                 }
@@ -355,10 +363,14 @@ namespace Лабиринт_Двоичное_дерево
                 {
                     retstr += "вправо";
                     int count = 0;
-                    while (path[i - 1].y < path[i].y && i < path.Count - 1)
+                    while (i < path.Count - 1 && path[i - 1].y < path[i].y)
                     {
                         count++;
                         i++;
+                    }
+                    if (i == path.Count - 1)
+                    {
+                        count++;
                     }
                     retstr += "_" + count.ToString() + ";\n";
                 }
@@ -366,13 +378,18 @@ namespace Лабиринт_Двоичное_дерево
                 {
                     retstr += "влево";
                     int count = 0;
-                    while (path[i - 1].y > path[i].y && i < path.Count - 1)
+                    while (i < path.Count - 1 && path[i - 1].y > path[i].y)
                     {
                         count++;
                         i++;
                     }
+                    if (i == path.Count - 1)
+                    {
+                        count++;
+                    }
                     retstr += "_" + count.ToString() + ";\n";
                 }
+                i++;
             }
             return retstr;
         }
