@@ -8,7 +8,7 @@ namespace Лабиринт_Двоичное_дерево
         static void Main(string[] args)
         {
             bool key = false, door = false;
-            Map map = new Map(10, 10, key, door, 2);
+            Map map = new Map(10, 10, key, door, 3);
             Character ch = new Character(map, 0, 0);
             while (!ch.win)
             {
@@ -65,7 +65,7 @@ namespace Лабиринт_Двоичное_дерево
         public bool key;
         public bool door;
         int Quest_number;
-        public List<Coords_path> path = null;
+        public List<Coords_path> path = new List<Coords_path>();
         string pathstr = "";
         public Map(int x, int y, bool key, bool door, int QNum)
         {
@@ -234,11 +234,10 @@ namespace Лабиринт_Двоичное_дерево
             bones = Door_place(bones);
             return bones;
         }
-        int[,] Goal_builder(int[,] bones)
+        int[,] Goal_builder(int[,] bones, int xstart, int ystart, List<Coords_path> coords_Paths)
         {
-            path = new List<Coords_path>();
             Random r = new Random();
-            int xlast = 0, ylast = 0, xstart = 1, ystart = 1, d = -1;
+            int xlast = 0, ylast = 0, d = -1;
             int[,] temp = new int[bones.GetLength(0), bones.GetLength(1)];
             for(int i = 0; i<bones.GetLength(0); i++)
             {
@@ -283,7 +282,7 @@ namespace Лабиринт_Двоичное_дерево
                 d--;
             }
             Coords_path n = new Coords_path(xlast, ylast);
-            path.Add(n);
+            coords_Paths.Add(n);
             Coords_path usl = new Coords_path(xstart, ystart);
             while (d != -1)   
             {
@@ -292,7 +291,7 @@ namespace Лабиринт_Двоичное_дерево
                     xlast--;
                     temp[xlast + 1, ylast] = 0;
                     n = new Coords_path(xlast, ylast);
-                    path.Add(n);
+                    coords_Paths.Add(n);
                     d++;
                 }
                 else if (temp[xlast, ylast - 1] == d + 1)
@@ -300,7 +299,7 @@ namespace Лабиринт_Двоичное_дерево
                     ylast--;
                     temp[xlast, ylast + 1] = 0;
                     n = new Coords_path(xlast, ylast);
-                    path.Add(n);
+                    coords_Paths.Add(n);
                     d++;
                 }
                 else if (temp[xlast + 1, ylast] == d + 1)
@@ -308,7 +307,7 @@ namespace Лабиринт_Двоичное_дерево
                     xlast++;
                     temp[xlast + 1, ylast] = 0;
                     n = new Coords_path(xlast, ylast);
-                    path.Add(n);
+                    coords_Paths.Add(n);
                     d++;
                 }
                 else if (temp[xlast, ylast + 1] == d + 1)
@@ -316,80 +315,70 @@ namespace Лабиринт_Двоичное_дерево
                     ylast++;
                     temp[xlast, ylast + 1] = 0;
                     n = new Coords_path(xlast, ylast);
-                    path.Add(n);
+                    coords_Paths.Add(n);
                     d++;
                 }
             }
-            path.Reverse();
             return bones;
         }
-        string Path_to_string()
+        string Path_to_string(List<Coords_path> coords_Paths)
         {
             string retstr = "";
-            int i = 1;
-            while (i < path.Count) 
+            List<List<Coords_path>> rebra = new List<List<Coords_path>>();
+            for(int j = 1; j<coords_Paths.Count; j++)
             {
-                if (path[i - 1].x < path[i].x)
+                rebra.Add(new List<Coords_path>());
+                rebra[j - 1].Add(coords_Paths[j - 1]);
+                rebra[j - 1].Add(coords_Paths[j]);
+            }
+            int i = 0;
+            while (i < rebra.Count - 1) 
+            {
+                int count = 0;
+                if (rebra[i][0].x < rebra[i][1].x)
                 {
-                    retstr += "вниз";
-                    int count = 1;
-                    while (i < path.Count - 1 && path[i - 1].x < path[i].x) 
+                    while (rebra[i][0].x < rebra[i][1].x && i < rebra.Count - 1)
                     {
                         count++;
                         i++;
                     }
-                    if (i == path.Count - 1)
-                    {
-                        count++;
-                    }
-                    retstr += "_" + count.ToString() + ";\n";
+                    retstr += "вниз_" + count.ToString() + ";\n";
+                    count = 0;
                 }
-                if(path[i - 1].x > path[i].x)
+                if(rebra[i][0].x > rebra[i][1].x)
                 {
-                    retstr += "вверх";
-                    int count = 1;
-                    while (i < path.Count - 1 && path[i - 1].x > path[i].x) 
+                    while (rebra[i][0].x > rebra[i][1].x && i < rebra.Count - 1)
                     {
                         count++;
                         i++;
                     }
-                    if (i == path.Count - 1)
-                    {
-                        count++;
-                    }
-                    retstr += "_" + count.ToString() + ";\n";
+                    retstr += "вверх_" + count.ToString() + ";\n";
+                    count = 0;
                 }
-                if (path[i - 1].y < path[i].y)
+                if (rebra[i][0].y > rebra[i][1].y)
                 {
-                    retstr += "вправо";
-                    int count = 0;
-                    while (i < path.Count - 1 && path[i - 1].y < path[i].y)
+                    while (rebra[i][0].y > rebra[i][1].y && i < rebra.Count - 1)
                     {
                         count++;
                         i++;
                     }
-                    if (i == path.Count - 1)
-                    {
-                        count++;
-                    }
-                    retstr += "_" + count.ToString() + ";\n";
+                    retstr += "влево_" + count.ToString() + ";\n";
+                    count = 0;
                 }
-                if (path[i - 1].y > path[i].y)
+                if (rebra[i][0].y < rebra[i][1].y)
                 {
-                    retstr += "влево";
-                    int count = 0;
-                    while (i < path.Count - 1 && path[i - 1].y > path[i].y)
+                    while (rebra[i][0].y < rebra[i][1].y && i < rebra.Count - 1)
                     {
                         count++;
                         i++;
                     }
-                    if (i == path.Count - 1)
-                    {
-                        count++;
-                    }
-                    retstr += "_" + count.ToString() + ";\n";
+                    retstr += "вправо_" + count.ToString() + ";\n";
+                    count = 0;
                 }
-                i++;
+                if(rebra[i][0].x == rebra[i][1].x && rebra[i][0].y == rebra[i][1].y)
+                {
+                    i++;
+                }
             }
             return retstr;
         }
@@ -433,8 +422,20 @@ namespace Лабиринт_Двоичное_дерево
                     bones = Path_builder(bones);
                     break;
                 case 2:
-                    bones = Goal_builder(bones);
-                    pathstr = Path_to_string();
+                    bones = Goal_builder(bones, 1, 1, path);
+                    path.Reverse();
+                    pathstr = Path_to_string(path);
+                    break;
+                case 3:
+                    List<Coords_path> p1 = new List<Coords_path>();
+                    bones = Goal_builder(bones, 1, 1, p1);
+                    p1.Reverse();
+                    List<Coords_path> p2 = new List<Coords_path>();
+                    bones = Goal_builder(bones, p1[p1.Count - 1].x, p1[p1.Count - 1].y, p2);
+                    p2.Reverse();
+                    foreach (Coords_path cp in p1) path.Add(cp);
+                    foreach (Coords_path cp in p2) path.Add(cp);
+                    pathstr = Path_to_string(path);
                     break;
             }
             return bones;
