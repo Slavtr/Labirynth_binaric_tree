@@ -61,6 +61,7 @@ namespace Лабиринт_Двоичное_дерево
     /// </summary>
     class Map
     {
+        int stepcount = 1;
         Tile[,] map;
         public bool key;
         public bool door;
@@ -122,13 +123,28 @@ namespace Лабиринт_Двоичное_дерево
                 }
                 Console.WriteLine();
             }
-            if (path != null)
+            if (Quest_number == 2)
             {
                 Console.WriteLine("Где окажется персонаж, пройдя по пути: \n" + pathstr);
             }
+            else if(Quest_number == 3)
+            {
+                Console.WriteLine("Постройте оптимальный маршрут в конечную точку: \n" + pathstr);
+            }
             if (door == true)
             {
-                Console.WriteLine("Лабиринт пройден\n");
+                if (Quest_number == 3)
+                {
+                    if (stepcount < path.Count)
+                    {
+                        Console.WriteLine("Маршрут оптимален\n");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Маршрут неоптимален\n");
+                    }
+                }
+                Console.WriteLine("Задание выполнено\n");
                 return 1;
             }
             else return 0;
@@ -234,7 +250,7 @@ namespace Лабиринт_Двоичное_дерево
             bones = Door_place(bones);
             return bones;
         }
-        int[,] Goal_builder(int[,] bones, int xstart, int ystart, List<Coords_path> coords_Paths)
+        int Goal_builder(int[,] bones, int xstart, int ystart, List<Coords_path> coords_Paths)
         {
             Random r = new Random();
             int xlast = 0, ylast = 0, d = -1;
@@ -284,8 +300,13 @@ namespace Лабиринт_Двоичное_дерево
             Coords_path n = new Coords_path(xlast, ylast);
             coords_Paths.Add(n);
             Coords_path usl = new Coords_path(xstart, ystart);
+            int count = 0;
             while (d != -1)   
             {
+                if(count == 50)
+                {
+                    return -1;
+                }
                 if (temp[xlast - 1, ylast] == d + 1)
                 {
                     xlast--;
@@ -293,6 +314,7 @@ namespace Лабиринт_Двоичное_дерево
                     n = new Coords_path(xlast, ylast);
                     coords_Paths.Add(n);
                     d++;
+                    count = 0;
                 }
                 else if (temp[xlast, ylast - 1] == d + 1)
                 {
@@ -301,6 +323,7 @@ namespace Лабиринт_Двоичное_дерево
                     n = new Coords_path(xlast, ylast);
                     coords_Paths.Add(n);
                     d++;
+                    count = 0;
                 }
                 else if (temp[xlast + 1, ylast] == d + 1)
                 {
@@ -309,6 +332,7 @@ namespace Лабиринт_Двоичное_дерево
                     n = new Coords_path(xlast, ylast);
                     coords_Paths.Add(n);
                     d++;
+                    count = 0;
                 }
                 else if (temp[xlast, ylast + 1] == d + 1)
                 {
@@ -317,9 +341,11 @@ namespace Лабиринт_Двоичное_дерево
                     n = new Coords_path(xlast, ylast);
                     coords_Paths.Add(n);
                     d++;
+                    count = 0;
                 }
+                count++;
             }
-            return bones;
+            return 0;
         }
         string Path_to_string(List<Coords_path> coords_Paths)
         {
@@ -380,6 +406,22 @@ namespace Лабиринт_Двоичное_дерево
                     i++;
                 }
             }
+            if (rebra[i][0].x < rebra[i][1].x)
+            {
+                retstr += "вниз_1;\n";
+            }
+            if (rebra[i][0].x > rebra[i][1].x)
+            {
+                retstr += "вверх_1;\n";
+            }
+            if (rebra[i][0].y > rebra[i][1].y)
+            {
+                retstr += "влево_1;\n";
+            }
+            if (rebra[i][0].y < rebra[i][1].y)
+            {
+                retstr += "вправо_1;\n";
+            }
             return retstr;
         }
         int[,] Labirynth_builder(int[,] bones)
@@ -416,22 +458,36 @@ namespace Лабиринт_Двоичное_дерево
             {
                 bones[b, m - 1] = 1;
             }
+            int o = 0;
             switch (Quest_number)
             {
                 case 1:
                     bones = Path_builder(bones);
                     break;
                 case 2:
-                    bones = Goal_builder(bones, 1, 1, path);
+                    o = 0;
+                    do
+                    {
+                        o = Goal_builder(bones, 1, 1, path);
+                    } while (o != 0);
                     path.Reverse();
                     pathstr = Path_to_string(path);
                     break;
                 case 3:
-                    List<Coords_path> p1 = new List<Coords_path>();
-                    bones = Goal_builder(bones, 1, 1, p1);
+                    o = 0;
+                    List<Coords_path> p1;
+                    do
+                    {
+                        p1 = new List<Coords_path>();
+                        o = Goal_builder(bones, 1, 1, p1);
+                    } while (o != 0);
                     p1.Reverse();
-                    List<Coords_path> p2 = new List<Coords_path>();
-                    bones = Goal_builder(bones, p1[p1.Count - 1].x, p1[p1.Count - 1].y, p2);
+                    List<Coords_path> p2;
+                    do
+                    {
+                        p2 = new List<Coords_path>();
+                        o = Goal_builder(bones, p1[p1.Count - 1].x, p1[p1.Count - 1].y, p2);
+                    } while (o != 0);
                     p2.Reverse();
                     foreach (Coords_path cp in p1) path.Add(cp);
                     foreach (Coords_path cp in p2) path.Add(cp);
@@ -442,6 +498,10 @@ namespace Лабиринт_Двоичное_дерево
         }
         public void Step_into(ref int x, ref int y, int character, int prev_x, int prev_y, ref Tile nxTile, ref Tile curTile, bool interact)
         {
+            if(Quest_number == 3)
+            {
+                stepcount++;
+            }
             if (map[x, y].Select_type != 1)
             {
                 if (nxTile.Select_type == 2 && interact)
@@ -451,6 +511,10 @@ namespace Лабиринт_Двоичное_дерево
                     map[x, y] = new Tile(0);
                 }
                 else if (nxTile.Select_type == 3 && key && interact)
+                {
+                    door = true;
+                }
+                else if(x == path[path.Count-1].x && y == path[path.Count-1].y && Quest_number == 3)
                 {
                     door = true;
                 }
