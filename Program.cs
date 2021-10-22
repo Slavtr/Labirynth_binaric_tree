@@ -8,7 +8,7 @@ namespace Лабиринт_Двоичное_дерево
         static void Main(string[] args)
         {
             bool key = false, door = false;
-            Map map = new Map(10, 10, key, door, 3);
+            Map map = new Map(10, 10, key, door, 4);
             Character ch = new Character(map, 0, 0);
             while (!ch.win)
             {
@@ -130,6 +130,10 @@ namespace Лабиринт_Двоичное_дерево
             else if(Quest_number == 3)
             {
                 Console.WriteLine("Постройте оптимальный маршрут в конечную точку: \n" + pathstr);
+            }
+            else if(Quest_number == 4)
+            {
+                Console.WriteLine("Исправьте неправильный маршрут: \n" + pathstr);
             }
             if (door == true)
             {
@@ -459,6 +463,8 @@ namespace Лабиринт_Двоичное_дерево
                 bones[b, m - 1] = 1;
             }
             int o = 0;
+            List<Coords_path> p2;
+            List<Coords_path> p1;
             switch (Quest_number)
             {
                 case 1:
@@ -475,14 +481,12 @@ namespace Лабиринт_Двоичное_дерево
                     break;
                 case 3:
                     o = 0;
-                    List<Coords_path> p1;
                     do
                     {
                         p1 = new List<Coords_path>();
                         o = Goal_builder(bones, 1, 1, p1);
                     } while (o != 0);
                     p1.Reverse();
-                    List<Coords_path> p2;
                     do
                     {
                         p2 = new List<Coords_path>();
@@ -492,6 +496,25 @@ namespace Лабиринт_Двоичное_дерево
                     foreach (Coords_path cp in p1) path.Add(cp);
                     foreach (Coords_path cp in p2) path.Add(cp);
                     pathstr = Path_to_string(path);
+                    break;
+                case 4:
+                    o = 0;
+                    do
+                    {
+                        p1 = new List<Coords_path>();
+                        o = Goal_builder(bones, 1, 1, p1);
+                    } while (o != 0);
+                    p1.Reverse();
+                    do
+                    {
+                        p2 = new List<Coords_path>();
+                        o = Goal_builder(bones, p1[p1.Count - 1].x, p1[p1.Count - 1].y, p2);
+                    } while (o != 0);
+                    p2.Reverse();
+                    foreach (Coords_path cp in p1) path.Add(cp);
+                    foreach (Coords_path cp in p2) path.Add(cp);
+                    pathstr = Path_to_string(path);
+                    bones = Path_builder(bones);
                     break;
             }
             return bones;
