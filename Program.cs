@@ -8,7 +8,7 @@ namespace Лабиринт_Двоичное_дерево
         static void Main(string[] args)
         {
             bool key = false, door = false;
-            Map map = new Map(10, 10, key, door, 4);
+            Map map = new Map(10, 10, key, door, 5);
             Character ch = new Character(map, 0, 0);
             while (!ch.win)
             {
@@ -65,7 +65,7 @@ namespace Лабиринт_Двоичное_дерево
         Tile[,] map;
         public bool key;
         public bool door;
-        int Quest_number;
+        public int Quest_number;
         public List<Coords_path> path = new List<Coords_path>();
         string pathstr = "";
         public Map(int x, int y, bool key, bool door, int QNum)
@@ -123,17 +123,20 @@ namespace Лабиринт_Двоичное_дерево
                 }
                 Console.WriteLine();
             }
-            if (Quest_number == 2)
+            switch (Quest_number)
             {
-                Console.WriteLine("Где окажется персонаж, пройдя по пути: \n" + pathstr);
-            }
-            else if(Quest_number == 3)
-            {
-                Console.WriteLine("Постройте оптимальный маршрут в конечную точку: \n" + pathstr);
-            }
-            else if(Quest_number == 4)
-            {
-                Console.WriteLine("Исправьте неправильный маршрут: \n" + pathstr);
+                case 2:
+                    Console.WriteLine("Где окажется персонаж, пройдя по пути: \n" + pathstr);
+                    break;
+                case 3:
+                    Console.WriteLine("Постройте оптимальный маршрут в конечную точку: \n" + pathstr);
+                    break;
+                case 4:
+                    Console.WriteLine("Исправьте неправильный маршрут: \n" + pathstr);
+                    break;
+                case 5:
+                    Console.WriteLine("Компьютер пытается вам противодействовать. Одолейте его. \n");
+                    break;
             }
             if (door == true)
             {
@@ -516,6 +519,9 @@ namespace Лабиринт_Двоичное_дерево
                     pathstr = Path_to_string(path);
                     bones = Path_builder(bones);
                     break;
+                case 5:
+                    bones = Path_builder(bones);
+                    break;
             }
             return bones;
         }
@@ -537,7 +543,7 @@ namespace Лабиринт_Двоичное_дерево
                 {
                     door = true;
                 }
-                else if(x == path[path.Count-1].x && y == path[path.Count-1].y && Quest_number == 3)
+                else if(Quest_number == 3 && x == path[path.Count-1].x && y == path[path.Count-1].y )
                 {
                     door = true;
                 }
@@ -604,50 +610,94 @@ namespace Лабиринт_Двоичное_дерево
         {
             string[] s = command.Split('_');
             int n;
+            Random r = new Random();
             switch (s[0])
             {
                 case "вверх":
                     n = Convert.ToInt32(s[1]);
-                    while (n > 0)
-                    {
+                    for(int i = 0; i<n; i++) { 
                         prew_y = cur_y;
                         prew_x = cur_x;
                         cur_x--;
                         Draw_char(false);
-                        n--;
+                    }
+                    if (map.Quest_number == 5)
+                    {
+                        int j = r.Next(n);
+                        for (int i = 0; i < j; i++)
+                        {
+                            prew_y = cur_y;
+                            prew_x = cur_x;
+                            cur_x++;
+                            Draw_char(false);
+                        }
+                        Console.WriteLine("Компьютер: вниз_" + j);
                     }
                     break;
                 case "вниз":
                     n = Convert.ToInt32(s[1]);
-                    while (n > 0)
+                    for (int i = 0; i < n; i++)
                     {
                         prew_y = cur_y;
                         prew_x = cur_x;
                         cur_x++;
                         Draw_char(false);
-                        n--;
+                    }
+                    if (map.Quest_number == 5)
+                    {
+                        int j = r.Next(n);
+                        for (int i = 0; i < j; i++)
+                        {
+                            prew_y = cur_y;
+                            prew_x = cur_x;
+                            cur_x--;
+                            Draw_char(false);
+                        }
+                        Console.WriteLine("Компьютер: вверх_" + j);
                     }
                     break;
                 case "влево":
                     n = Convert.ToInt32(s[1]);
-                    while (n > 0)
+                    for (int i = 0; i < n; i++)
                     {
                         prew_y = cur_y;
                         prew_x = cur_x;
                         cur_y--;
                         Draw_char(false);
-                        n--;
+                    }
+                    if (map.Quest_number == 5)
+                    {
+                        int j = r.Next(n);
+                        for (int i = 0; i < j; i++)
+                        {
+                            prew_y = cur_y;
+                            prew_x = cur_x;
+                            cur_y++;
+                            Draw_char(false);
+                        }
+                        Console.WriteLine("Компьютер: вправо_" + j);
                     }
                     break;
                 case "вправо":
                     n = Convert.ToInt32(s[1]);
-                    while (n > 0)
+                    for (int i = 0; i < n; i++)
                     {
                         prew_y = cur_y;
                         prew_x = cur_x;
                         cur_y++;
                         Draw_char(false);
-                        n--;
+                    }
+                    if (map.Quest_number == 5)
+                    {
+                        int j = r.Next(n);
+                        for (int i = 0; i < j; i++)
+                        {
+                            prew_y = cur_y;
+                            prew_x = cur_x;
+                            cur_y--;
+                            Draw_char(false);
+                        }
+                        Console.WriteLine("Компьютер: влево_" + j);
                     }
                     break;
                 case "использовать":
